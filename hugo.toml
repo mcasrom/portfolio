@@ -1,0 +1,53 @@
+baseURL = "https://mcasrom.github.io/portfolio/"
+languageCode = "es-ES"
+title = "mcasrom | Geopolítica · Linux · Drones"
+theme = "PaperMod"
+paginate = 10
+
+[params]
+  author = "mcasrom"
+  description = "Dashboard geopolítico, laboratorio Linux, drones y análisis electoral"
+  defaultTheme = "dark"
+  ShowReadingTime = true
+  ShowShareButtons = false
+  ShowPostNavLinks = true
+  ShowBreadCrumbs = true
+  ShowCodeCopyButtons = true
+
+[params.homeInfoParams]
+  Title = "mcasrom · Hub"
+  Content = "Geopolítica · Elecciones · Media · Linux Lab · Drones"
+
+[[params.socialIcons]]
+  name = "github"
+  url = "https://github.com/mcasrom"
+
+[[params.socialIcons]]
+  name = "youtube"
+  url = "https://youtube.com/@mcasrom"
+
+[menu]
+  [[menu.main]]
+    name = "Geopolítica"
+    url = "/geopolitica/"
+    weight = 1
+  [[menu.main]]
+    name = "España"
+    url = "/espana/"
+    weight = 2
+  [[menu.main]]
+    name = "Media"
+    url = "/media/"
+    weight = 3
+  [[menu.main]]
+    name = "Linux Lab"
+    url = "/lab/"
+    weight = 4
+  [[menu.main]]
+    name = "Drones"
+    url = "/drones/"
+    weight = 5
+  [[menu.main]]
+    name = "Tools"
+    url = "/tools/"
+    weight = 6
