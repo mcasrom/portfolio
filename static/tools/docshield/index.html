@@ -1,0 +1,1295 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DocShield — Protección de Documentos de Identidad</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;800&display=swap');
+
+  :root {
+    --bg: #0a0a0f;
+    --surface: #12121a;
+    --surface2: #1a1a26;
+    --border: #2a2a3d;
+    --accent: #00e5ff;
+    --accent2: #ff3d71;
+    --accent3: #7b61ff;
+    --text: #e8e8f0;
+    --text-dim: #6b6b8a;
+    --success: #00e676;
+    --warning: #ffab00;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Syne', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* Grid background */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(0,229,255,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,229,255,0.03) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .container {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 2rem;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* HEADER */
+  header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 3rem;
+    padding-bottom: 2rem;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .logo {
+    width: 48px; height: 48px;
+    background: linear-gradient(135deg, var(--accent), var(--accent3));
+    border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.4rem;
+    flex-shrink: 0;
+    box-shadow: 0 0 20px rgba(0,229,255,0.3);
+  }
+
+  h1 {
+    font-size: 1.8rem;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+  }
+
+  h1 span { color: var(--accent); }
+
+  .subtitle {
+    font-size: 0.8rem;
+    color: var(--text-dim);
+    font-family: 'Space Mono', monospace;
+    margin-top: 0.2rem;
+  }
+
+  .badge-local {
+    margin-left: auto;
+    background: rgba(0,230,118,0.1);
+    border: 1px solid rgba(0,230,118,0.3);
+    color: var(--success);
+    padding: 0.4rem 0.9rem;
+    border-radius: 20px;
+    font-size: 0.72rem;
+    font-family: 'Space Mono', monospace;
+    display: flex; align-items: center; gap: 0.4rem;
+    white-space: nowrap;
+  }
+
+  .dot-pulse {
+    width: 7px; height: 7px;
+    background: var(--success);
+    border-radius: 50%;
+    animation: pulse 2s infinite;
+  }
+
+  @keyframes pulse {
+    0%,100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.5; transform: scale(0.8); }
+  }
+
+  /* ALERT RGPD */
+  .alert-rgpd {
+    background: rgba(255,61,113,0.08);
+    border: 1px solid rgba(255,61,113,0.25);
+    border-left: 3px solid var(--accent2);
+    border-radius: 8px;
+    padding: 1rem 1.2rem;
+    margin-bottom: 2rem;
+    font-size: 0.83rem;
+    color: #ffb3c1;
+    line-height: 1.6;
+  }
+
+  .alert-rgpd strong { color: var(--accent2); font-weight: 600; }
+
+  /* MAIN GRID */
+  .main-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+    margin-bottom: 1.5rem;
+  }
+
+  @media (max-width: 680px) {
+    .main-grid { grid-template-columns: 1fr; }
+  }
+
+  /* CARDS */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.4rem;
+  }
+
+  .card-title {
+    font-size: 0.72rem;
+    font-family: 'Space Mono', monospace;
+    color: var(--accent);
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    margin-bottom: 1rem;
+    display: flex; align-items: center; gap: 0.5rem;
+  }
+
+  .card-title::before {
+    content: '';
+    width: 20px; height: 2px;
+    background: var(--accent);
+  }
+
+  /* DROP ZONE */
+  .dropzone {
+    border: 2px dashed var(--border);
+    border-radius: 10px;
+    padding: 2.5rem 1rem;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    background: var(--surface2);
+    position: relative;
+  }
+
+  .dropzone:hover, .dropzone.drag-over {
+    border-color: var(--accent);
+    background: rgba(0,229,255,0.04);
+  }
+
+  .dropzone input[type=file] {
+    position: absolute; inset: 0;
+    opacity: 0; cursor: pointer;
+    width: 100%; height: 100%;
+  }
+
+  .drop-icon { font-size: 2.5rem; margin-bottom: 0.6rem; }
+
+  .drop-text {
+    font-size: 0.85rem;
+    color: var(--text-dim);
+    line-height: 1.5;
+  }
+
+  .drop-text strong { color: var(--text); }
+
+  /* FORM FIELDS */
+  .field { margin-bottom: 1rem; }
+
+  label {
+    display: block;
+    font-size: 0.75rem;
+    font-family: 'Space Mono', monospace;
+    color: var(--text-dim);
+    margin-bottom: 0.4rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+
+  input[type=text], input[type=date], select, textarea {
+    width: 100%;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    color: var(--text);
+    padding: 0.6rem 0.8rem;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.82rem;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+
+  input:focus, select:focus, textarea:focus {
+    border-color: var(--accent);
+  }
+
+  textarea { resize: vertical; min-height: 70px; }
+
+  .range-row {
+    display: flex; align-items: center; gap: 0.8rem;
+  }
+
+  input[type=range] {
+    flex: 1; accent-color: var(--accent);
+    background: transparent; border: none; padding: 0;
+  }
+
+  .range-val {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.82rem;
+    color: var(--accent);
+    min-width: 35px;
+    text-align: right;
+  }
+
+  /* COLOR SWATCH */
+  .color-row {
+    display: flex; gap: 0.5rem; flex-wrap: wrap;
+  }
+
+  .color-swatch {
+    width: 28px; height: 28px;
+    border-radius: 6px;
+    cursor: pointer;
+    border: 2px solid transparent;
+    transition: all 0.15s;
+  }
+
+  .color-swatch.active { border-color: var(--accent); transform: scale(1.15); }
+
+  /* PRESETS */
+  .preset-row { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 1rem; }
+
+  .preset-btn {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    color: var(--text-dim);
+    padding: 0.35rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.72rem;
+    font-family: 'Space Mono', monospace;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+
+  .preset-btn:hover, .preset-btn.active {
+    border-color: var(--accent);
+    color: var(--accent);
+    background: rgba(0,229,255,0.06);
+  }
+
+  /* PREVIEW */
+  .preview-area {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    min-height: 220px;
+    display: flex; align-items: center; justify-content: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .preview-area canvas { max-width: 100%; max-height: 400px; border-radius: 8px; }
+
+  .preview-placeholder {
+    text-align: center;
+    color: var(--text-dim);
+    font-size: 0.82rem;
+  }
+
+  .preview-placeholder .big { font-size: 2rem; margin-bottom: 0.5rem; }
+
+  /* FULL WIDTH CARD */
+  .card-full { grid-column: 1 / -1; }
+
+  /* ACTIONS */
+  .action-row {
+    display: flex; gap: 1rem; flex-wrap: wrap;
+    margin-top: 1.5rem;
+  }
+
+  .btn {
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.82rem;
+    font-weight: 700;
+    cursor: pointer;
+    border: none;
+    transition: all 0.2s;
+    display: flex; align-items: center; gap: 0.5rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+
+  .btn-primary {
+    background: linear-gradient(135deg, var(--accent), var(--accent3));
+    color: #000;
+    box-shadow: 0 4px 20px rgba(0,229,255,0.25);
+  }
+
+  .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 6px 25px rgba(0,229,255,0.4); }
+
+  .btn-secondary {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text-dim);
+  }
+
+  .btn-secondary:hover { border-color: var(--accent); color: var(--accent); }
+
+  .btn-danger {
+    background: rgba(255,61,113,0.1);
+    border: 1px solid rgba(255,61,113,0.3);
+    color: var(--accent2);
+  }
+
+  .btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none !important; }
+
+  /* STATUS */
+  .status-bar {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 0.9rem 1.2rem;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.78rem;
+    color: var(--text-dim);
+    display: flex; align-items: center; gap: 0.7rem;
+    margin-top: 1rem;
+  }
+
+  .status-bar.ok { border-color: rgba(0,230,118,0.3); color: var(--success); }
+  .status-bar.warn { border-color: rgba(255,171,0,0.3); color: var(--warning); }
+  .status-bar.err { border-color: rgba(255,61,113,0.3); color: var(--accent2); }
+
+  /* SECURITY INFO */
+  .security-grid {
+    display: grid;
+    grid-template-columns: repeat(3,1fr);
+    gap: 1rem;
+    margin-top: 1.5rem;
+  }
+
+  @media (max-width: 680px) {
+    .security-grid { grid-template-columns: 1fr; }
+  }
+
+  .sec-item {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 1rem;
+  }
+
+  .sec-icon { font-size: 1.5rem; margin-bottom: 0.5rem; }
+  .sec-title { font-size: 0.8rem; font-weight: 600; margin-bottom: 0.3rem; }
+  .sec-desc { font-size: 0.72rem; color: var(--text-dim); line-height: 1.5; }
+
+  /* PYTHON CODE */
+  .code-block {
+    background: #0d0d14;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 1.2rem;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.75rem;
+    color: #abb2bf;
+    overflow-x: auto;
+    line-height: 1.7;
+    margin-top: 1rem;
+    position: relative;
+  }
+
+  .code-block .kw { color: #c678dd; }
+  .code-block .fn { color: #61afef; }
+  .code-block .str { color: #98c379; }
+  .code-block .cm { color: #5c6370; font-style: italic; }
+  .code-block .num { color: #d19a66; }
+
+  .copy-code-btn {
+    position: absolute; top: 0.8rem; right: 0.8rem;
+    background: var(--surface2); border: 1px solid var(--border);
+    color: var(--text-dim); padding: 0.3rem 0.7rem;
+    border-radius: 5px; font-size: 0.7rem; cursor: pointer;
+    font-family: 'Space Mono', monospace;
+    transition: all 0.15s;
+  }
+
+  .copy-code-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+  /* TABS */
+  .tabs { display: flex; gap: 0; margin-bottom: -1px; }
+
+  .tab {
+    padding: 0.6rem 1.2rem;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.75rem;
+    cursor: pointer;
+    border: 1px solid var(--border);
+    border-bottom: none;
+    border-radius: 8px 8px 0 0;
+    color: var(--text-dim);
+    background: var(--surface2);
+    transition: all 0.15s;
+    margin-right: 3px;
+  }
+
+  .tab.active {
+    color: var(--accent);
+    background: var(--surface);
+    border-color: var(--border);
+    border-bottom-color: var(--surface);
+  }
+
+  .tab-content { display: none; }
+  .tab-content.active { display: block; }
+
+  /* FOOTER */
+  footer {
+    margin-top: 3rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--border);
+    font-size: 0.72rem;
+    color: var(--text-dim);
+    font-family: 'Space Mono', monospace;
+    display: flex; justify-content: space-between; flex-wrap: wrap; gap: 0.5rem;
+  }
+
+  footer a { color: var(--accent3); text-decoration: none; }
+
+  select option { background: var(--surface2); }
+
+  .toggle-row {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 0.7rem;
+  }
+
+  .toggle-label { font-size: 0.82rem; }
+  .toggle-sub { font-size: 0.7rem; color: var(--text-dim); margin-top: 0.1rem; }
+
+  .toggle {
+    position: relative; width: 42px; height: 22px;
+    background: var(--border); border-radius: 11px;
+    cursor: pointer; transition: background 0.2s; flex-shrink: 0;
+  }
+
+  .toggle.on { background: var(--accent); }
+
+  .toggle::after {
+    content: '';
+    position: absolute; top: 3px; left: 3px;
+    width: 16px; height: 16px;
+    background: #fff; border-radius: 50%;
+    transition: left 0.2s;
+  }
+
+  .toggle.on::after { left: 23px; }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <!-- HEADER -->
+  <header>
+    <div class="logo">🛡️</div>
+    <div>
+      <h1>Doc<span>Shield</span></h1>
+      <div class="subtitle">// protección RGPD · marca de agua · procesado local</div>
+    </div>
+    <div class="badge-local"><div class="dot-pulse"></div> 100% LOCAL — sin red</div>
+  </header>
+
+  <!-- ALERTA LEGAL -->
+  <div class="alert-rgpd">
+    <strong>⚖️ Contexto Legal:</strong> El envío de copias de DNI/Pasaporte por correo electrónico sin protección constituye una vulneración del
+    <strong>RGPD (Reglamento UE 2016/679)</strong> y la <strong>LOPDGDD</strong>. Los datos de identidad son <em>datos personales de categoría especial</em>.
+    Esta herramienta genera imágenes con marca de agua vinculada al uso específico declarado, dificultando la reutilización no autorizada.
+    <strong>Todo el procesado ocurre en tu navegador. Ningún dato sale de tu dispositivo.</strong>
+  </div>
+
+  <!-- TABS -->
+  <div class="tabs">
+    <div class="tab active" onclick="switchTab('app')">🖼️ Aplicación</div>
+    <div class="tab" onclick="switchTab('python')">🐍 Script Python</div>
+    <div class="tab" onclick="switchTab('info')">📋 Guía Legal</div>
+  </div>
+
+  <!-- TAB: APP -->
+  <div id="tab-app" class="tab-content active">
+    <div class="main-grid" style="margin-top:1.5rem">
+
+      <!-- SUBIR IMAGEN -->
+      <div class="card">
+        <div class="card-title">01 · Cargar Documento</div>
+        <div class="dropzone" id="dropzone">
+          <input type="file" id="fileInput" accept="image/*,.pdf" multiple onchange="handleFiles(this.files)">
+          <div class="drop-icon">📄</div>
+          <div class="drop-text">
+            <strong>Arrastra o haz clic</strong><br>
+            DNI · Pasaporte · NIE · Permiso de conducir<br>
+            <span style="font-size:0.7rem;color:var(--text-dim)">JPG · PNG · WEBP — máx. 10MB</span>
+          </div>
+        </div>
+        <div id="fileList" style="margin-top:0.8rem"></div>
+      </div>
+
+      <!-- CONFIGURAR MARCA DE AGUA -->
+      <div class="card">
+        <div class="card-title">02 · Configurar Marca de Agua</div>
+
+        <div style="margin-bottom:0.8rem">
+          <div style="font-size:0.72rem;color:var(--text-dim);margin-bottom:0.4rem;text-transform:uppercase;font-family:'Space Mono',monospace;letter-spacing:0.06em">Presets rápidos</div>
+          <div class="preset-row">
+            <div class="preset-btn" onclick="applyPreset('tramite')">Trámite Admin.</div>
+            <div class="preset-btn" onclick="applyPreset('banco')">Entidad Bancaria</div>
+            <div class="preset-btn" onclick="applyPreset('alquiler')">Contrato Alquiler</div>
+            <div class="preset-btn" onclick="applyPreset('laboral')">Proceso Laboral</div>
+            <div class="preset-btn" onclick="applyPreset('custom')">Personalizado</div>
+          </div>
+        </div>
+
+        <div class="field">
+          <label>Destinatario / Entidad</label>
+          <input type="text" id="recipient" placeholder="Ej: Ayuntamiento de Madrid — Padrón Municipal" value="">
+        </div>
+
+        <div class="field">
+          <label>Finalidad del envío</label>
+          <textarea id="purpose" placeholder="Ej: Acreditación de identidad para tramitación de empadronamiento. USO ÚNICO Y EXCLUSIVO."></textarea>
+        </div>
+
+        <div class="field">
+          <label>Fecha de validez</label>
+          <input type="date" id="validDate">
+        </div>
+      </div>
+
+      <!-- OPCIONES VISUALES -->
+      <div class="card">
+        <div class="card-title">03 · Opciones Visuales</div>
+
+        <div class="field">
+          <label>Estilo de marca de agua</label>
+          <select id="wmStyle" onchange="updatePreview()">
+            <option value="diagonal">Diagonal repetida (máx. protección)</option>
+            <option value="center">Central con marco</option>
+            <option value="grid">Cuadrícula densa</option>
+            <option value="corners">Esquinas + centro</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label>Opacidad</label>
+          <div class="range-row">
+            <input type="range" id="opacity" min="10" max="80" value="35" oninput="document.getElementById('opVal').textContent=this.value+'%';updatePreview()">
+            <span class="range-val" id="opVal">35%</span>
+          </div>
+        </div>
+
+        <div class="field">
+          <label>Tamaño de texto</label>
+          <div class="range-row">
+            <input type="range" id="fontSize" min="8" max="32" value="14" oninput="document.getElementById('fsVal').textContent=this.value+'px';updatePreview()">
+            <span class="range-val" id="fsVal">14px</span>
+          </div>
+        </div>
+
+        <div class="field">
+          <label>Color de marca</label>
+          <div class="color-row" id="colorPicker">
+            <div class="color-swatch active" style="background:#ff3d71" data-color="#ff3d71" onclick="pickColor(this)"></div>
+            <div class="color-swatch" style="background:#00e5ff" data-color="#00e5ff" onclick="pickColor(this)"></div>
+            <div class="color-swatch" style="background:#7b61ff" data-color="#7b61ff" onclick="pickColor(this)"></div>
+            <div class="color-swatch" style="background:#ffab00" data-color="#ffab00" onclick="pickColor(this)"></div>
+            <div class="color-swatch" style="background:#ffffff" data-color="#ffffff" onclick="pickColor(this)"></div>
+            <div class="color-swatch" style="background:#000000;border:1px solid #444" data-color="#000000" onclick="pickColor(this)"></div>
+          </div>
+        </div>
+
+        <div class="field">
+          <label>Añadir elementos de seguridad</label>
+          <div class="toggle-row">
+            <div>
+              <div class="toggle-label">Número de referencia único</div>
+              <div class="toggle-sub">UUID generado localmente por envío</div>
+            </div>
+            <div class="toggle on" id="togUUID" onclick="toggle('togUUID','addUUID')"></div>
+            <input type="hidden" id="addUUID" value="1">
+          </div>
+          <div class="toggle-row">
+            <div>
+              <div class="toggle-label">Timestamp de generación</div>
+              <div class="toggle-sub">Fecha/hora de creación del documento</div>
+            </div>
+            <div class="toggle on" id="togTS" onclick="toggle('togTS','addTS')"></div>
+            <input type="hidden" id="addTS" value="1">
+          </div>
+          <div class="toggle-row">
+            <div>
+              <div class="toggle-label">Eliminar metadatos EXIF</div>
+              <div class="toggle-sub">Borra GPS, cámara, etc. de la imagen</div>
+            </div>
+            <div class="toggle on" id="togEXIF" onclick="toggle('togEXIF','stripEXIF')"></div>
+            <input type="hidden" id="stripEXIF" value="1">
+          </div>
+          <div class="toggle-row" style="border:none;margin:0">
+            <div>
+              <div class="toggle-label">Calidad reducida (anti-OCR)</div>
+              <div class="toggle-sub">Dificulta extracción automatizada de datos</div>
+            </div>
+            <div class="toggle" id="togAntiOCR" onclick="toggle('togAntiOCR','antiOCR')"></div>
+            <input type="hidden" id="antiOCR" value="0">
+          </div>
+        </div>
+      </div>
+
+      <!-- PREVISUALIZACIÓN -->
+      <div class="card">
+        <div class="card-title">04 · Previsualización</div>
+        <div class="preview-area" id="previewArea">
+          <div class="preview-placeholder">
+            <div class="big">👁️</div>
+            Carga una imagen para previsualizar
+          </div>
+        </div>
+        <div id="previewInfo" style="font-size:0.72rem;color:var(--text-dim);margin-top:0.5rem;font-family:'Space Mono',monospace"></div>
+      </div>
+    </div>
+
+    <!-- ACCIONES -->
+    <div class="action-row">
+      <button class="btn btn-primary" id="btnProcess" onclick="processAll()" disabled>
+        ⚡ Generar y Descargar
+      </button>
+      <button class="btn btn-secondary" onclick="updatePreview()">
+        🔄 Actualizar Vista
+      </button>
+      <button class="btn btn-danger" onclick="resetAll()">
+        🗑️ Limpiar Todo
+      </button>
+    </div>
+
+    <div id="statusBar" class="status-bar" style="display:none"></div>
+
+    <!-- SEGURIDAD -->
+    <div class="security-grid">
+      <div class="sec-item">
+        <div class="sec-icon">🔒</div>
+        <div class="sec-title">Sin red · 100% local</div>
+        <div class="sec-desc">Todo el procesado ocurre en tu navegador mediante Canvas API. Ningún byte de tu documento sale del dispositivo.</div>
+      </div>
+      <div class="sec-item">
+        <div class="sec-icon">🧹</div>
+        <div class="sec-title">Metadatos eliminados</div>
+        <div class="sec-desc">El proceso de re-renderizado por canvas elimina automáticamente EXIF: GPS, modelo de cámara, fecha de captura original.</div>
+      </div>
+      <div class="sec-item">
+        <div class="sec-icon">📎</div>
+        <div class="sec-title">Vinculación de uso</div>
+        <div class="sec-desc">La marca de agua vincula jurídicamente la imagen a un destinatario y finalidad específica, constituyendo evidencia de uso indebido si se reutiliza.</div>
+      </div>
+    </div>
+  </div><!-- end tab-app -->
+
+  <!-- TAB: PYTHON -->
+  <div id="tab-python" class="tab-content">
+    <div class="card" style="margin-top:1.5rem">
+      <div class="card-title">Script Python — Procesado por lotes en escritorio</div>
+      <p style="font-size:0.83rem;color:var(--text-dim);line-height:1.6;margin-bottom:1rem">
+        Para uso avanzado o integración en flujos de trabajo. Requiere <code style="color:var(--accent)">Pillow</code> y opcionalmente <code style="color:var(--accent)">piexif</code>.
+        Instala con: <code style="color:var(--success)">pip install Pillow piexif</code>
+      </p>
+
+      <div class="tabs" style="margin-bottom:0">
+        <div class="tab active" onclick="switchCodeTab('py-main')">docshield.py</div>
+        <div class="tab" onclick="switchCodeTab('py-cli')">CLI usage</div>
+        <div class="tab" onclick="switchCodeTab('py-flask')">Flask server local</div>
+      </div>
+
+      <div id="py-main" class="tab-content active">
+        <div class="code-block" id="codeMain">
+          <button class="copy-code-btn" onclick="copyCode('codeMain')">Copiar</button>
+<span class="cm">#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+DocShield — Marca de agua para documentos de identidad
+Procesado 100% local · RGPD-compliant
+Autor: tu-nombre | Licencia: MIT
+"""</span>
+
+<span class="kw">import</span> os, sys, uuid, argparse
+<span class="kw">from</span> datetime <span class="kw">import</span> datetime
+<span class="kw">from</span> pathlib <span class="kw">import</span> Path
+<span class="kw">from</span> PIL <span class="kw">import</span> Image, ImageDraw, ImageFont
+<span class="kw">try</span>:
+    <span class="kw">import</span> piexif
+    HAS_PIEXIF = <span class="kw">True</span>
+<span class="kw">except</span> ImportError:
+    HAS_PIEXIF = <span class="kw">False</span>
+
+
+<span class="kw">def</span> <span class="fn">strip_exif</span>(img: Image.Image) -> Image.Image:
+    <span class="str">"""Elimina todos los metadatos EXIF de la imagen."""</span>
+    data = img.tobytes()
+    clean = Image.frombytes(img.mode, img.size, data)
+    clean.info = {}
+    <span class="kw">return</span> clean
+
+
+<span class="kw">def</span> <span class="fn">get_font</span>(size: int) -> ImageFont.ImageFont:
+    <span class="str">"""Intenta cargar fuente del sistema, fallback a default."""</span>
+    candidates = [
+        <span class="str">"/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf"</span>,
+        <span class="str">"/System/Library/Fonts/Helvetica.ttc"</span>,
+        <span class="str">"C:/Windows/Fonts/arial.ttf"</span>,
+    ]
+    <span class="kw">for</span> path <span class="kw">in</span> candidates:
+        <span class="kw">if</span> os.path.exists(path):
+            <span class="kw">try</span>: <span class="kw">return</span> ImageFont.truetype(path, size)
+            <span class="kw">except</span>: <span class="kw">pass</span>
+    <span class="kw">return</span> ImageFont.load_default()
+
+
+<span class="kw">def</span> <span class="fn">apply_watermark</span>(
+    img: Image.Image,
+    recipient: str,
+    purpose: str,
+    valid_date: str = <span class="str">""</span>,
+    color: tuple = (<span class="num">255</span>, <span class="num">0</span>, <span class="num">80</span>),
+    opacity: int = <span class="num">80</span>,   <span class="cm"># 0-255</span>
+    font_size: int = <span class="num">14</span>,
+    style: str = <span class="str">"diagonal"</span>,
+    add_uuid: bool = <span class="kw">True</span>,
+    add_timestamp: bool = <span class="kw">True</span>,
+) -> Image.Image:
+    <span class="str">"""
+    Aplica marca de agua multi-capa a documento de identidad.
+    
+    Args:
+        img: Imagen PIL de entrada
+        recipient: Destinatario del documento (entidad/persona)
+        purpose: Finalidad del uso (texto libre)
+        valid_date: Fecha de validez (YYYY-MM-DD)
+        color: RGB color de la marca de agua
+        opacity: Opacidad 0-255 (recomendado: 60-100)
+        font_size: Tamaño de fuente en píxeles
+        style: 'diagonal' | 'center' | 'grid' | 'corners'
+        add_uuid: Añadir referencia única por documento
+        add_timestamp: Añadir timestamp de generación
+    Returns:
+        Imagen PIL con marca de agua aplicada
+    """</span>
+    img = img.convert(<span class="str">"RGBA"</span>)
+    w, h = img.size
+    
+    <span class="cm"># Capa transparente para la marca de agua</span>
+    overlay = Image.new(<span class="str">"RGBA"</span>, (w, h), (<span class="num">0</span>, <span class="num">0</span>, <span class="num">0</span>, <span class="num">0</span>))
+    draw = ImageDraw.Draw(overlay)
+    
+    font = <span class="fn">get_font</span>(font_size)
+    font_small = <span class="fn">get_font</span>(max(<span class="num">9</span>, font_size - <span class="num">4</span>))
+    
+    ref_id = str(uuid.uuid4())[:<span class="num">8</span>].upper()
+    ts = datetime.now().strftime(<span class="str">"%Y-%m-%d %H:%M"</span>)
+    
+    <span class="cm"># Líneas de texto para la marca de agua</span>
+    lines = [
+        f<span class="str">"⚠ USO EXCLUSIVO: {recipient}"</span>,
+        f<span class="str">"FINALIDAD: {purpose[:60]}"</span>,
+    ]
+    <span class="kw">if</span> valid_date: lines.append(f<span class="str">"VÁLIDO HASTA: {valid_date}"</span>)
+    <span class="kw">if</span> add_uuid:   lines.append(f<span class="str">"REF: {ref_id}"</span>)
+    <span class="kw">if</span> add_timestamp: lines.append(f<span class="str">"GENERADO: {ts}"</span>)
+    lines.append(<span class="str">"NO REUTILIZAR · RGPD ART.5"</span>)
+    
+    text_block = <span class="str">" | "</span>.join(lines)
+    c = (*color, opacity)
+    
+    <span class="kw">if</span> style == <span class="str">"diagonal"</span>:
+        <span class="cm"># Tile diagonal: rotar texto y repetir</span>
+        tile_size = max(w, h) * <span class="num">2</span>
+        tile = Image.new(<span class="str">"RGBA"</span>, (tile_size, tile_size), (<span class="num">0</span>,<span class="num">0</span>,<span class="num">0</span>,<span class="num">0</span>))
+        td = ImageDraw.Draw(tile)
+        step = font_size * <span class="num">6</span>
+        <span class="kw">for</span> y <span class="kw">in</span> range(<span class="num">0</span>, tile_size, step):
+            td.text((<span class="num">0</span>, y), text_block * <span class="num">3</span>, font=font, fill=c)
+        rotated = tile.rotate(<span class="num">-35</span>, expand=<span class="kw">False</span>)
+        offset = ((w - tile_size) // <span class="num">2</span>, (h - tile_size) // <span class="num">2</span>)
+        overlay.paste(rotated, offset, rotated)
+        
+    <span class="kw">elif</span> style == <span class="str">"center"</span>:
+        <span class="cm"># Marca central grande + borde</span>
+        main_font = <span class="fn">get_font</span>(font_size * <span class="num">2</span>)
+        draw.text((w//<span class="num">2</span>, h//<span class="num">2</span>), lines[<span class="num">0</span>], font=main_font, fill=c, anchor=<span class="str">"mm"</span>)
+        <span class="kw">for</span> i, line <span class="kw">in</span> enumerate(lines[<span class="num">1</span>:]):
+            draw.text((w//<span class="num">2</span>, h//<span class="num">2</span> + (i+<span class="num">1</span>)*font_size*<span class="num">2</span>),
+                      line, font=font_small, fill=c, anchor=<span class="str">"mm"</span>)
+        <span class="cm"># Marco de seguridad</span>
+        margin = <span class="num">10</span>
+        draw.rectangle([margin, margin, w-margin, h-margin],
+                        outline=c, width=<span class="num">3</span>)
+        
+    <span class="kw">elif</span> style == <span class="str">"grid"</span>:
+        step_x = w // <span class="num">3</span>
+        step_y = h // <span class="num">4</span>
+        <span class="kw">for</span> gx <span class="kw">in</span> range(<span class="num">0</span>, w, step_x):
+            <span class="kw">for</span> gy <span class="kw">in</span> range(<span class="num">0</span>, h, step_y):
+                <span class="kw">for</span> i, line <span class="kw">in</span> enumerate(lines):
+                    draw.text((gx, gy + i*font_size*<span class="num">1</span>.<span class="num">2</span>),
+                              line, font=font_small, fill=c)
+    
+    <span class="kw">elif</span> style == <span class="str">"corners"</span>:
+        positions = [(<span class="num">10</span>, <span class="num">10</span>), (w//<span class="num">2</span>-<span class="num">50</span>, h//<span class="num">2</span>-<span class="num">20</span>)]
+        <span class="kw">for</span> px, py <span class="kw">in</span> positions:
+            <span class="kw">for</span> i, line <span class="kw">in</span> enumerate(lines):
+                draw.text((px, py + i * font_size * <span class="num">1</span>.<span class="num">4</span>),
+                          line, font=font_small, fill=c)
+    
+    <span class="cm"># Fusionar overlay</span>
+    result = Image.alpha_composite(img, overlay)
+    <span class="kw">return</span> result.convert(<span class="str">"RGB"</span>)
+
+
+<span class="kw">def</span> <span class="fn">process_document</span>(
+    input_path: str,
+    output_dir: str,
+    recipient: str,
+    purpose: str,
+    **kwargs
+) -> str:
+    <span class="str">"""Procesa un documento y guarda la versión protegida."""</span>
+    src = Path(input_path)
+    dst_dir = Path(output_dir)
+    dst_dir.mkdir(parents=True, exist_ok=<span class="kw">True</span>)
+    
+    img = Image.open(src)
+    
+    <span class="cm"># Strip EXIF si está disponible</span>
+    <span class="kw">if</span> kwargs.get(<span class="str">"strip_exif"</span>, <span class="kw">True</span>):
+        img = <span class="fn">strip_exif</span>(img)
+    
+    <span class="cm"># Reducir resolución si anti_ocr=True</span>
+    <span class="kw">if</span> kwargs.get(<span class="str">"anti_ocr"</span>, <span class="kw">False</span>):
+        w, h = img.size
+        img = img.resize((w//<span class="num">2</span>, h//<span class="num">2</span>), Image.LANCZOS)
+        img = img.resize((w, h), Image.NEAREST)
+    
+    result = <span class="fn">apply_watermark</span>(img, recipient, purpose, **kwargs)
+    
+    ts_str = datetime.now().strftime(<span class="str">"%Y%m%d_%H%M%S"</span>)
+    out_name = f<span class="str">"PROTEGIDO_{src.stem}_{ts_str}.jpg"</span>
+    out_path = dst_dir / out_name
+    
+    result.save(out_path, <span class="str">"JPEG"</span>, quality=<span class="num">88</span>, optimize=<span class="kw">True</span>)
+    <span class="kw">return</span> str(out_path)
+        </div>
+      </div>
+
+      <div id="py-cli" class="tab-content">
+        <div class="code-block">
+          <button class="copy-code-btn" onclick="copyCode(this.parentElement)">Copiar</button>
+<span class="cm"># ── Uso desde línea de comandos ──────────────────────────</span>
+
+<span class="cm"># Instalar dependencias</span>
+pip install Pillow piexif
+
+<span class="cm"># Procesar UN documento</span>
+python docshield.py \
+  --input dni_anverso.jpg \
+  --output ./protegidos/ \
+  --recipient <span class="str">"Banco ACME — Apertura cuenta corriente"</span> \
+  --purpose <span class="str">"Acreditación identidad. Uso único y exclusivo."</span> \
+  --valid-date <span class="str">"2024-12-31"</span> \
+  --style diagonal \
+  --opacity <span class="num">80</span>
+
+<span class="cm"># Procesar LOTE de documentos (todos los jpg de un directorio)</span>
+python docshield.py \
+  --input ./documentos/*.jpg \
+  --output ./protegidos/ \
+  --recipient <span class="str">"Ayuntamiento Madrid — Padrón Municipal"</span> \
+  --purpose <span class="str">"Trámite administrativo — solicitud empadronamiento"</span> \
+  --batch
+
+<span class="cm"># Con todas las opciones de seguridad activadas</span>
+python docshield.py \
+  --input pasaporte.jpg \
+  --output ./salida/ \
+  --recipient <span class="str">"Empresa XYZ SL — Contrato laboral"</span> \
+  --purpose <span class="str">"Verificación identidad trabajador nuevo"</span> \
+  --style grid \
+  --opacity <span class="num">60</span> \
+  --font-size <span class="num">12</span> \
+  --color <span class="str">"255,0,80"</span> \
+  --strip-exif \
+  --anti-ocr \
+  --add-uuid \
+  --add-timestamp
+
+<span class="cm"># Ver ayuda completa</span>
+python docshield.py --help
+        </div>
+      </div>
+
+      <div id="py-flask" class="tab-content">
+        <div class="code-block">
+          <button class="copy-code-btn" onclick="copyCode(this.parentElement)">Copiar</button>
+<span class="cm">"""
+Flask server local — interfaz web completa en escritorio
+Acceso: http://localhost:5000
+"""</span>
+<span class="kw">from</span> flask <span class="kw">import</span> Flask, request, send_file, jsonify
+<span class="kw">from</span> docshield <span class="kw">import</span> process_document
+<span class="kw">import</span> tempfile, os
+
+app = Flask(__name__)
+app.config[<span class="str">'MAX_CONTENT_LENGTH'</span>] = <span class="num">16</span> * <span class="num">1024</span> * <span class="num">1024</span>  <span class="cm"># 16MB</span>
+
+<span class="kw">@</span>app.route(<span class="str">'/process'</span>, methods=[<span class="str">'POST'</span>])
+<span class="kw">def</span> <span class="fn">process</span>():
+    file = request.files[<span class="str">'document'</span>]
+    params = request.form
+    
+    <span class="kw">with</span> tempfile.TemporaryDirectory() <span class="kw">as</span> tmpdir:
+        input_path = os.path.join(tmpdir, file.filename)
+        file.save(input_path)
+        
+        output = <span class="fn">process_document</span>(
+            input_path=input_path,
+            output_dir=tmpdir,
+            recipient=params[<span class="str">'recipient'</span>],
+            purpose=params[<span class="str">'purpose'</span>],
+            valid_date=params.get(<span class="str">'valid_date'</span>, <span class="str">''</span>),
+            style=params.get(<span class="str">'style'</span>, <span class="str">'diagonal'</span>),
+            opacity=int(params.get(<span class="str">'opacity'</span>, <span class="num">80</span>)),
+            strip_exif=<span class="kw">True</span>,
+            add_uuid=<span class="kw">True</span>,
+            add_timestamp=<span class="kw">True</span>,
+        )
+        <span class="kw">return</span> send_file(output, as_attachment=<span class="kw">True</span>,
+                         download_name=os.path.basename(output))
+
+<span class="kw">if</span> __name__ == <span class="str">'__main__'</span>:
+    <span class="cm"># Solo escucha en localhost — NO accesible desde red</span>
+    app.run(host=<span class="str">'127.0.0.1'</span>, port=<span class="num">5000</span>, debug=<span class="kw">False</span>)
+        </div>
+      </div>
+    </div>
+  </div><!-- end tab-python -->
+
+  <!-- TAB: INFO LEGAL -->
+  <div id="tab-info" class="tab-content">
+    <div class="card" style="margin-top:1.5rem">
+      <div class="card-title">Marco Legal · Buenas Prácticas</div>
+
+      <div style="font-size:0.85rem;line-height:1.8;color:var(--text)">
+
+        <p style="margin-bottom:1rem"><strong style="color:var(--accent)">¿Por qué es un riesgo enviar copias de DNI sin proteger?</strong><br>
+        El DNI/pasaporte contiene datos de categoría especial (nombre completo, fecha nacimiento, foto, número de documento). Su transmisión electrónica sin medidas técnicas puede vulnerar el <strong>RGPD Art. 5.1.f</strong> (integridad y confidencialidad) y el <strong>Art. 32</strong> (medidas técnicas apropiadas). La AEPD ha sancionado casos similares.</p>
+
+        <p style="margin-bottom:1rem"><strong style="color:var(--accent)">¿Qué aporta la marca de agua jurídicamente?</strong><br>
+        Vincula el documento a un <em>destinatario específico y finalidad declarada</em>, creando evidencia de uso indebido si se reutiliza. No es una medida perfecta, pero cumple con el principio de <strong>accountability</strong> (responsabilidad proactiva) del RGPD.</p>
+
+        <p style="margin-bottom:1rem"><strong style="color:var(--accent)">Alternativas adicionales recomendadas</strong><br>
+        • Enviar por canales cifrados (correo con S/MIME o PGP, no WhatsApp)<br>
+        • Solicitar confirmación de destrucción del documento tras el trámite<br>
+        • Registrar en un log local qué copia se envió, a quién y cuándo<br>
+        • Pedir a la entidad que acredite su base legal para solicitarlo</p>
+
+        <p style="margin-bottom:1rem"><strong style="color:var(--accent)">¿Puedes negarte a enviar una copia del DNI?</strong><br>
+        Sí. El RGPD contempla el <strong>principio de minimización de datos</strong>. Si la entidad puede verificar tu identidad por otros medios, tienes derecho a exigirlo. Si aun así lo solicitan, tienen obligación de informarte de la base legal y finalidad.</p>
+
+        <p><strong style="color:var(--accent)">Reclamaciones y recursos</strong><br>
+        • <strong>AEPD</strong> (España): aepd.es — reclamaciones de protección de datos<br>
+        • <strong>Tu DPO</strong>: Las empresas con más de 250 empleados deben tener un Delegado de Protección de Datos<br>
+        • <strong>Formulario RGPD</strong>: puedes solicitar limitación del tratamiento, rectificación o supresión</p>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <span>DocShield · Procesado 100% local · Sin cookies · Sin telemetría</span>
+    <span>RGPD (UE) 2016/679 · LOPDGDD 3/2018 · <a href="#">AEPD guidelines</a></span>
+  </footer>
+</div>
+
+<canvas id="hiddenCanvas" style="display:none"></canvas>
+
+<script>
+// ─── STATE ────────────────────────────────────────────────
+let loadedFiles = [];
+let selectedColor = '#ff3d71';
+let currentPreviewURL = null;
+
+// ─── TABS ─────────────────────────────────────────────────
+function switchTab(id) {
+  document.querySelectorAll('.tab').forEach((t,i) => {
+    const tabs = ['app','python','info'];
+    t.classList.toggle('active', tabs[i] === id);
+  });
+  document.querySelectorAll('.tab-content[id^="tab-"]').forEach(c => {
+    c.classList.toggle('active', c.id === 'tab-' + id);
+  });
+}
+
+function switchCodeTab(id) {
+  const allTabs = ['py-main','py-cli','py-flask'];
+  document.querySelectorAll('#tab-python .tab').forEach((t,i) => {
+    t.classList.toggle('active', allTabs[i] === id);
+  });
+  allTabs.forEach(t => {
+    const el = document.getElementById(t);
+    if(el) el.classList.toggle('active', t === id);
+  });
+}
+
+// ─── TOGGLE ───────────────────────────────────────────────
+function toggle(toggleId, hiddenId) {
+  const tog = document.getElementById(toggleId);
+  const hid = document.getElementById(hiddenId);
+  const on = tog.classList.toggle('on');
+  hid.value = on ? '1' : '0';
+  updatePreview();
+}
+
+// ─── COLOR ────────────────────────────────────────────────
+function pickColor(el) {
+  document.querySelectorAll('.color-swatch').forEach(s => s.classList.remove('active'));
+  el.classList.add('active');
+  selectedColor = el.dataset.color;
+  updatePreview();
+}
+
+// ─── PRESETS ──────────────────────────────────────────────
+const presets = {
+  tramite: { recipient: 'Administración Pública — Trámite Municipal', purpose: 'Acreditación de identidad para trámite administrativo. Uso único y exclusivo.', style: 'diagonal' },
+  banco:   { recipient: 'Entidad Bancaria — Apertura de Cuenta', purpose: 'Verificación KYC/AML. Documento válido únicamente para este proceso.', style: 'grid' },
+  alquiler:{ recipient: 'Arrendador — Contrato de Arrendamiento', purpose: 'Verificación identidad arrendatario. No válido para otros fines.', style: 'diagonal' },
+  laboral: { recipient: 'Recursos Humanos — Proceso de Selección', purpose: 'Alta en SS y contrato laboral. Uso restringido al expediente nº___', style: 'corners' },
+  custom:  { recipient: '', purpose: '', style: 'diagonal' },
+};
+
+function applyPreset(key) {
+  document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
+  event.target.classList.add('active');
+  const p = presets[key];
+  document.getElementById('recipient').value = p.recipient;
+  document.getElementById('purpose').value = p.purpose;
+  document.getElementById('wmStyle').value = p.style;
+  updatePreview();
+}
+
+// ─── FILE HANDLING ────────────────────────────────────────
+const dropzone = document.getElementById('dropzone');
+dropzone.addEventListener('dragover', e => { e.preventDefault(); dropzone.classList.add('drag-over'); });
+dropzone.addEventListener('dragleave', () => dropzone.classList.remove('drag-over'));
+dropzone.addEventListener('drop', e => {
+  e.preventDefault(); dropzone.classList.remove('drag-over');
+  handleFiles(e.dataTransfer.files);
+});
+
+function handleFiles(files) {
+  loadedFiles = Array.from(files).filter(f => f.type.startsWith('image/'));
+  const list = document.getElementById('fileList');
+  list.innerHTML = loadedFiles.map((f, i) =>
+    `<div style="display:flex;align-items:center;gap:0.5rem;padding:0.4rem 0;border-bottom:1px solid var(--border);font-size:0.78rem;font-family:'Space Mono',monospace">
+      <span style="color:var(--accent)">📄</span>
+      <span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${f.name}</span>
+      <span style="color:var(--text-dim)">${(f.size/1024).toFixed(0)}KB</span>
+    </div>`
+  ).join('');
+  document.getElementById('btnProcess').disabled = loadedFiles.length === 0;
+  if (loadedFiles.length > 0) updatePreview();
+}
+
+// ─── UUID ─────────────────────────────────────────────────
+function genUUID() {
+  return 'xxxxxxxx'.replace(/x/g, () => Math.floor(Math.random()*16).toString(16).toUpperCase());
+}
+
+// ─── WATERMARK ENGINE (Canvas) ────────────────────────────
+function hexToRgb(hex) {
+  const r = parseInt(hex.slice(1,3),16);
+  const g = parseInt(hex.slice(3,5),16);
+  const b = parseInt(hex.slice(5,7),16);
+  return [r, g, b];
+}
+
+function buildWatermarkLines() {
+  const recipient = document.getElementById('recipient').value || 'DESTINATARIO NO ESPECIFICADO';
+  const purpose   = document.getElementById('purpose').value   || 'FINALIDAD NO ESPECIFICADA';
+  const validDate = document.getElementById('validDate').value;
+  const addUUID   = document.getElementById('addUUID').value === '1';
+  const addTS     = document.getElementById('addTS').value === '1';
+
+  const lines = [
+    `⚠ USO EXCLUSIVO: ${recipient}`,
+    `FINALIDAD: ${purpose.substring(0,70)}`,
+  ];
+  if (validDate) lines.push(`VÁLIDO HASTA: ${validDate}`);
+  if (addUUID)   lines.push(`REF: ${genUUID()}`);
+  if (addTS)     lines.push(`GEN: ${new Date().toLocaleString('es-ES')}`);
+  lines.push('NO REUTILIZAR · RGPD ART.5');
+  return lines;
+}
+
+function drawWatermark(ctx, w, h, lines, style, opacity, fontSize, color) {
+  const [r, g, b] = hexToRgb(color);
+  const alpha = opacity / 100;
+  ctx.fillStyle = `rgba(${r},${g},${b},${alpha})`;
+  ctx.strokeStyle = `rgba(${r},${g},${b},${alpha})`;
+  ctx.font = `bold ${fontSize}px monospace`;
+
+  const textBlock = lines.join(' | ');
+
+  if (style === 'diagonal') {
+    ctx.save();
+    const step = fontSize * 5;
+    for (let y = -h; y < h * 2; y += step) {
+      ctx.save();
+      ctx.translate(w/2, h/2);
+      ctx.rotate(-35 * Math.PI / 180);
+      ctx.fillText(textBlock.repeat(3), -w*1.5, y - h/2);
+      ctx.restore();
+    }
+    ctx.restore();
+  } else if (style === 'center') {
+    ctx.font = `bold ${fontSize*2}px monospace`;
+    ctx.textAlign = 'center';
+    ctx.fillText(lines[0], w/2, h/2);
+    ctx.font = `bold ${fontSize}px monospace`;
+    lines.slice(1).forEach((l, i) => ctx.fillText(l, w/2, h/2 + (i+1)*fontSize*1.8));
+    ctx.lineWidth = 3;
+    ctx.strokeRect(10, 10, w-20, h-20);
+    ctx.textAlign = 'left';
+  } else if (style === 'grid') {
+    const cols = 3, rows = 4;
+    const stepX = w / cols, stepY = h / rows;
+    for (let gx = 0; gx < cols; gx++) for (let gy = 0; gy < rows; gy++) {
+      lines.forEach((l, i) => ctx.fillText(l, gx*stepX+5, gy*stepY + i*fontSize*1.3 + fontSize));
+    }
+  } else if (style === 'corners') {
+    [[10,10],[w/2-100,h/2-20]].forEach(([px,py]) =>
+      lines.forEach((l,i) => ctx.fillText(l, px, py + i*fontSize*1.5))
+    );
+  }
+}
+
+function applyAntiOCR(ctx, w, h) {
+  // Añade ruido sutil que dificulta OCR sin degradar visibilidad humana
+  const imageData = ctx.getImageData(0, 0, w, h);
+  const data = imageData.data;
+  for (let i = 0; i < data.length; i += 4) {
+    const noise = (Math.random() - 0.5) * 15;
+    data[i] = Math.min(255, Math.max(0, data[i] + noise));
+    data[i+1] = Math.min(255, Math.max(0, data[i+1] + noise));
+    data[i+2] = Math.min(255, Math.max(0, data[i+2] + noise));
+  }
+  ctx.putImageData(imageData, 0, 0);
+}
+
+function processImage(file) {
+  return new Promise((resolve) => {
+    const reader = new FileReader();
+    reader.onload = e => {
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.getElementById('hiddenCanvas');
+        const scale = Math.min(1, 1600 / Math.max(img.width, img.height));
+        canvas.width  = Math.round(img.width  * scale);
+        canvas.height = Math.round(img.height * scale);
+        const ctx = canvas.getContext('2d');
+
+        // Dibujar imagen (esto ya elimina EXIF al re-renderizar)
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+        const style    = document.getElementById('wmStyle').value;
+        const opacity  = parseInt(document.getElementById('opacity').value);
+        const fontSize = parseInt(document.getElementById('fontSize').value);
+        const antiOCR  = document.getElementById('antiOCR').value === '1';
+        const lines    = buildWatermarkLines();
+
+        drawWatermark(ctx, canvas.width, canvas.height, lines, style, opacity, fontSize, selectedColor);
+
+        if (antiOCR) applyAntiOCR(ctx, canvas.width, canvas.height);
+
+        resolve({ dataURL: canvas.toDataURL('image/jpeg', 0.88), filename: file.name });
+      };
+      img.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+// ─── PREVIEW ──────────────────────────────────────────────
+function updatePreview() {
+  if (loadedFiles.length === 0) return;
+  processImage(loadedFiles[0]).then(({ dataURL }) => {
+    const area = document.getElementById('previewArea');
+    area.innerHTML = `<img src="${dataURL}" style="max-width:100%;max-height:380px;border-radius:8px">`;
+    document.getElementById('previewInfo').textContent =
+      `Previsualización de: ${loadedFiles[0].name} — ${loadedFiles.length} archivo(s) en cola`;
+  });
+}
+
+// ─── PROCESS & DOWNLOAD ───────────────────────────────────
+async function processAll() {
+  const btn = document.getElementById('btnProcess');
+  const status = document.getElementById('statusBar');
+  btn.disabled = true;
+  status.style.display = 'flex';
+  status.className = 'status-bar warn';
+  status.textContent = `⏳ Procesando ${loadedFiles.length} archivo(s)...`;
+
+  try {
+    for (let i = 0; i < loadedFiles.length; i++) {
+      status.textContent = `⏳ Procesando ${i+1}/${loadedFiles.length}: ${loadedFiles[i].name}`;
+      const { dataURL, filename } = await processImage(loadedFiles[i]);
+      const a = document.createElement('a');
+      a.href = dataURL;
+      a.download = `PROTEGIDO_${filename.replace(/\.[^.]+$/, '')}_${Date.now()}.jpg`;
+      a.click();
+      await new Promise(r => setTimeout(r, 300));
+    }
+    status.className = 'status-bar ok';
+    status.textContent = `✅ ${loadedFiles.length} documento(s) generado(s) correctamente. Sin datos enviados a servidores.`;
+  } catch(err) {
+    status.className = 'status-bar err';
+    status.textContent = `❌ Error: ${err.message}`;
+  }
+  btn.disabled = false;
+}
+
+// ─── RESET ────────────────────────────────────────────────
+function resetAll() {
+  loadedFiles = [];
+  document.getElementById('fileList').innerHTML = '';
+  document.getElementById('previewArea').innerHTML = `
+    <div class="preview-placeholder"><div class="big">👁️</div>Carga una imagen para previsualizar</div>`;
+  document.getElementById('statusBar').style.display = 'none';
+  document.getElementById('btnProcess').disabled = true;
+  document.getElementById('previewInfo').textContent = '';
+  document.getElementById('fileInput').value = '';
+}
+
+// ─── COPY CODE ────────────────────────────────────────────
+function copyCode(el) {
+  const block = typeof el === 'string' ? document.getElementById(el) : el;
+  const text = block.innerText.replace(/^Copiar\n/, '');
+  navigator.clipboard.writeText(text).then(() => {
+    const btn = block.querySelector('.copy-code-btn') || el;
+    if(btn && btn.textContent) { btn.textContent = '✅ Copiado'; setTimeout(() => btn.textContent = 'Copiar', 2000); }
+  });
+}
+
+// ─── INIT ─────────────────────────────────────────────────
+document.getElementById('validDate').valueAsDate = new Date(Date.now() + 30*24*3600*1000);
+</script>
+</body>
+</html>
