@@ -72,7 +72,21 @@ Antes de facilitar una copia de cualquier documento de identidad, ten en cuenta:
 - **Zero backend** — ningún dato sale del navegador
 - Parte del ecosistema **Con el Odroid en la Mochila** — herramientas abiertas, auditables
 
-**[→ Abrir DocShield ahora](/portfolio/tools/docshield/)**
+<div style="margin: 2rem 0; padding: 1.5rem 2rem; background: #111318; border: 1px solid #1e2230; border-left: 4px solid #00e5ff; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:1rem;">
+  <div>
+    <div style="font-family:'Space Mono',monospace; font-size:0.68rem; color:#5a6080; letter-spacing:0.15em; text-transform:uppercase; margin-bottom:0.4rem;">Herramienta gratuita · 100% local · sin red</div>
+    <div style="font-size:1rem; font-weight:700; color:#e0e6f0;">DocShield — Protege tu documento ahora</div>
+  </div>
+  <a href="/portfolio/tools/docshield/"
+     style="font-family:'Space Mono',monospace; font-size:0.75rem; letter-spacing:0.12em;
+            text-transform:uppercase; padding:0.7rem 1.4rem; background:#00e5ff;
+            color:#0a0c10; text-decoration:none; font-weight:700; white-space:nowrap;
+            transition: opacity 0.2s;"
+     onmouseover="this.style.opacity='0.85'"
+     onmouseout="this.style.opacity='1'">
+    🛡️ Abrir DocShield →
+  </a>
+</div>
 
 ---
 

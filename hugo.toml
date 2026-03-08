@@ -64,3 +64,6 @@ theme = "PaperMod"
     name = "Contacto"
     url = "/contacto/"
     weight = 9
+
+[markup.goldmark.renderer]
+  unsafe = true
