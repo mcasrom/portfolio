@@ -1,0 +1,519 @@
+{{- define "main" }}
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;800&display=swap');
+
+  :root {
+    --accent:  #00e5ff;
+    --accent2: #ff4d6d;
+    --accent3: #a0ff60;
+    --surface: #111318;
+    --border:  #1e2230;
+    --text:    #e0e6f0;
+    --muted:   #5a6080;
+    --mono:    'Space Mono', monospace;
+    --sans:    'Syne', sans-serif;
+  }
+
+  /* ── HERO ── */
+  .home-hero {
+    padding: 3.5rem 0 2.5rem;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 3rem;
+    position: relative;
+    overflow: hidden;
+  }
+  .home-hero::before {
+    content: '';
+    position: absolute;
+    top: -80px; left: -80px;
+    width: 400px; height: 400px;
+    background: radial-gradient(circle, rgba(0,229,255,0.06) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .home-hero::after {
+    content: '';
+    position: absolute;
+    bottom: -60px; right: 5%;
+    width: 300px; height: 300px;
+    background: radial-gradient(circle, rgba(255,77,109,0.05) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .hero-eyebrow {
+    font-family: var(--mono);
+    font-size: 0.68rem;
+    letter-spacing: 0.22em;
+    color: var(--accent);
+    text-transform: uppercase;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+  }
+  .hero-eyebrow::before {
+    content: '▶';
+    font-size: 0.55rem;
+    animation: blink 1.5s step-end infinite;
+  }
+  @keyframes blink { 50% { opacity: 0; } }
+
+  .home-hero h1 {
+    font-family: var(--sans);
+    font-size: clamp(2.2rem, 5vw, 4rem);
+    font-weight: 800;
+    line-height: 1.05;
+    color: var(--text);
+    margin: 0 0 1.2rem;
+  }
+  .home-hero h1 em {
+    font-style: normal;
+    color: var(--accent);
+  }
+  .home-hero h1 strong {
+    color: var(--accent2);
+    font-weight: 800;
+  }
+
+  .hero-lead {
+    font-family: var(--mono);
+    font-size: 0.88rem;
+    color: var(--muted);
+    max-width: 680px;
+    line-height: 1.8;
+    margin-bottom: 1.8rem;
+  }
+  .hero-lead b {
+    color: var(--text);
+  }
+
+  .hero-ctas {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.8rem;
+    margin-bottom: 2rem;
+  }
+  .cta-primary {
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    padding: 0.6rem 1.2rem;
+    background: var(--accent);
+    color: #0a0c10;
+    text-decoration: none;
+    font-weight: 700;
+    transition: opacity 0.2s;
+  }
+  .cta-primary:hover { opacity: 0.85; text-decoration: none; color: #0a0c10; }
+  .cta-secondary {
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    padding: 0.6rem 1.2rem;
+    border: 1px solid var(--border);
+    color: var(--muted);
+    text-decoration: none;
+    transition: border-color 0.2s, color 0.2s;
+  }
+  .cta-secondary:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+    text-decoration: none;
+  }
+
+  .hero-stats {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2rem;
+  }
+  .stat-item {
+    font-family: var(--mono);
+  }
+  .stat-num {
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: var(--text);
+    display: block;
+    line-height: 1;
+  }
+  .stat-label {
+    font-size: 0.62rem;
+    color: var(--muted);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  /* ── MAPA SECTION ── */
+  .map-section {
+    margin-bottom: 3.5rem;
+  }
+  .section-label {
+    font-family: var(--mono);
+    font-size: 0.68rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 1.2rem;
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+  }
+  .section-label::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  .map-wrapper {
+    position: relative;
+    border: 1px solid var(--border);
+    border-top: 3px solid var(--accent);
+    overflow: hidden;
+    background: var(--surface);
+    transition: border-color 0.2s;
+  }
+  .map-wrapper:hover { border-color: var(--accent); }
+
+  .map-iframe-container {
+    width: 100%;
+    height: 500px;
+    position: relative;
+  }
+  .map-iframe-container iframe {
+    width: 100%;
+    height: 100%;
+    border: none;
+    display: block;
+  }
+  .map-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to bottom, transparent 55%, #111318 100%);
+    pointer-events: none;
+    z-index: 5;
+  }
+  .map-live-badge {
+    position: absolute;
+    top: 1rem; right: 1rem;
+    z-index: 20;
+    font-family: var(--mono);
+    font-size: 0.62rem;
+    padding: 0.25rem 0.6rem;
+    background: rgba(10,12,16,0.85);
+    border: 1px solid var(--accent);
+    color: var(--accent);
+    letter-spacing: 0.15em;
+    backdrop-filter: blur(4px);
+  }
+  .map-layers-badge {
+    position: absolute;
+    top: 1rem; left: 1rem;
+    z-index: 20;
+    font-family: var(--mono);
+    font-size: 0.6rem;
+    padding: 0.25rem 0.6rem;
+    background: rgba(10,12,16,0.85);
+    border: 1px solid var(--border);
+    color: var(--muted);
+    letter-spacing: 0.08em;
+    backdrop-filter: blur(4px);
+  }
+
+  .map-footer {
+    padding: 1.2rem 1.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+    border-top: 1px solid var(--border);
+  }
+  .map-footer-left h3 {
+    font-family: var(--sans);
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--text);
+    margin: 0 0 0.3rem;
+  }
+  .map-footer-left p {
+    font-family: var(--mono);
+    font-size: 0.7rem;
+    color: var(--muted);
+    margin: 0;
+    line-height: 1.5;
+  }
+  .map-layers {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+  }
+  .layer-dot {
+    font-family: var(--mono);
+    font-size: 0.62rem;
+    padding: 0.2rem 0.5rem;
+    border: 1px solid var(--border);
+    color: var(--muted);
+    letter-spacing: 0.06em;
+  }
+  .map-open-btn {
+    font-family: var(--mono);
+    font-size: 0.7rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    padding: 0.5rem 1rem;
+    border: 1px solid var(--accent);
+    color: var(--accent);
+    text-decoration: none;
+    white-space: nowrap;
+    transition: background 0.2s, color 0.2s;
+  }
+  .map-open-btn:hover {
+    background: var(--accent);
+    color: #0a0c10;
+    text-decoration: none;
+  }
+
+  /* ── NARRATIVE ── */
+  .narrative-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+    margin-bottom: 3.5rem;
+  }
+  @media (max-width: 700px) {
+    .narrative-grid { grid-template-columns: 1fr; }
+  }
+  .narrative-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--card-color, var(--accent));
+    padding: 1.4rem;
+  }
+  .narrative-card h3 {
+    font-family: var(--sans);
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--text);
+    margin: 0 0 0.6rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  .narrative-card p {
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    color: var(--muted);
+    margin: 0;
+    line-height: 1.7;
+  }
+  .narrative-card p b { color: var(--text); }
+
+  /* ── APPS MINI GRID ── */
+  .mini-apps {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 1rem;
+    margin-bottom: 3.5rem;
+  }
+  .mini-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: 1.1rem;
+    text-decoration: none;
+    color: inherit;
+    display: block;
+    transition: border-color 0.2s, transform 0.2s;
+  }
+  .mini-card:hover {
+    border-color: var(--card-accent, var(--accent));
+    transform: translateY(-2px);
+    text-decoration: none;
+    color: inherit;
+  }
+  .mini-card-icon { font-size: 1.4rem; margin-bottom: 0.6rem; display: block; }
+  .mini-card-title {
+    font-family: var(--sans);
+    font-size: 0.88rem;
+    font-weight: 600;
+    color: var(--text);
+    margin: 0 0 0.4rem;
+  }
+  .mini-card-desc {
+    font-family: var(--mono);
+    font-size: 0.68rem;
+    color: var(--muted);
+    margin: 0;
+    line-height: 1.5;
+  }
+</style>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- HERO                                         -->
+<!-- ═══════════════════════════════════════════ -->
+<div class="home-hero">
+  <div class="hero-eyebrow">Con el Odroid en la Mochila · mcasrom</div>
+  <h1>El mundo en tensión.<br><em>Los datos</em>, sin <strong>filtros</strong>.</h1>
+  <p class="hero-lead">
+    En 2025 el orden geopolítico se reescribe a velocidad récord:
+    <b>guerras activas en tres continentes</b>, rutas energéticas bajo presión,
+    cables submarinos en riesgo, elecciones que cambian mapas de poder.
+    Este hub agrega inteligencia estratégica de <b>fuentes abiertas</b> —
+    construido con Python, Streamlit y una tarjeta ARM Odroid.
+    Sin algoritmos opacos. Sin agenda editorial. Solo datos.
+  </p>
+  <div class="hero-ctas">
+    <a href="https://sieg-mapa-global.streamlit.app/" target="_blank" class="cta-primary">
+      → Abrir mapa global
+    </a>
+    <a href="/portfolio/apps/" class="cta-secondary">Ver todas las apps</a>
+    <a href="/portfolio/about/" class="cta-secondary">Sobre el proyecto</a>
+  </div>
+  <div class="hero-stats">
+    <div class="stat-item">
+      <span class="stat-num">70+</span>
+      <span class="stat-label">puntos geolocalizados</span>
+    </div>
+    <div class="stat-item">
+      <span class="stat-num">6</span>
+      <span class="stat-label">capas temáticas</span>
+    </div>
+    <div class="stat-item">
+      <span class="stat-num">5</span>
+      <span class="stat-label">apps en producción</span>
+    </div>
+    <div class="stat-item">
+      <span class="stat-num">ARM</span>
+      <span class="stat-label">infraestructura Odroid</span>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- MAPA GLOBAL                                  -->
+<!-- ═══════════════════════════════════════════ -->
+<div class="map-section">
+  <p class="section-label">Mapa geopolítico global — en vivo</p>
+
+  <div class="map-wrapper">
+    <div class="map-iframe-container">
+      <iframe
+        src="https://sieg-mapa-global.streamlit.app/?embedded=true"
+        title="SIEG — Mapa Geopolítico Global interactivo: conflictos, petróleo, cables submarinos, elecciones, tensiones nucleares, migración"
+        loading="lazy"
+        allowfullscreen>
+      </iframe>
+      <div class="map-overlay"></div>
+      <div class="map-live-badge">● LIVE</div>
+      <div class="map-layers-badge">6 capas · 70+ eventos · OSINT</div>
+    </div>
+
+    <div class="map-footer">
+      <div class="map-footer-left">
+        <h3>SIEG · Mapa Geopolítico Global</h3>
+        <p>Datos curados de fuentes abiertas · Actualización continua · Python + Folium + Odroid</p>
+        <div class="map-layers" style="margin-top:0.6rem;">
+          <span class="layer-dot">🔴 Conflictos</span>
+          <span class="layer-dot">🟡 Petróleo</span>
+          <span class="layer-dot">🔵 Cables</span>
+          <span class="layer-dot">🟢 Elecciones</span>
+          <span class="layer-dot">🟠 Nuclear</span>
+          <span class="layer-dot">🟣 Migración</span>
+        </div>
+      </div>
+      <a href="https://sieg-mapa-global.streamlit.app/" target="_blank" class="map-open-btn">
+        Abrir en pantalla completa →
+      </a>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- NARRATIVA GEOPOLÍTICA — 4 bloques SEO        -->
+<!-- ═══════════════════════════════════════════ -->
+<p class="section-label">Contexto geopolítico 2025</p>
+
+<div class="narrative-grid">
+  <div class="narrative-card" style="--card-color: #ff4d6d;">
+    <h3>🔴 Conflictos activos</h3>
+    <p>
+      La guerra en <b>Ucrania</b> entra en su tercer año sin resolución clara.
+      <b>Gaza</b> concentra atención internacional. En el <b>Sahel</b>,
+      la retirada occidental deja un vacío que Rusia y grupos yihadistas disputan.
+      El Congo oriental vive su peor crisis en décadas. El mundo registra
+      <b>más conflictos simultáneos que en cualquier momento desde 1945</b>.
+    </p>
+  </div>
+
+  <div class="narrative-card" style="--card-color: #ffd60a;">
+    <h3>🟡 Geopolítica del petróleo</h3>
+    <p>
+      El <b>Estrecho de Hormuz</b> concentra el 40% del tráfico mundial de crudo.
+      Los <b>Houthis en Yemen</b> han alterado las rutas del Mar Rojo,
+      encareciendo el transporte global. Las sanciones a <b>Rusia e Irán</b>
+      reconfiguran los flujos energéticos hacia Asia. La transición verde
+      avanza pero el petróleo sigue siendo el eje del poder geopolítico.
+    </p>
+  </div>
+
+  <div class="narrative-card" style="--card-color: #00e5ff;">
+    <h3>🔵 Cables submarinos — infraestructura invisible</h3>
+    <p>
+      El <b>99% del tráfico de internet</b> transcurre por cables submarinos.
+      En 2024 se reportaron cortes en el <b>Mar Rojo</b> vinculados al conflicto yemení.
+      El <b>Canal de Suez</b> es el mayor nodo de concentración de cables del mundo.
+      Su vulnerabilidad es estratégica: cortar fibra es cortar economías enteras.
+    </p>
+  </div>
+
+  <div class="narrative-card" style="--card-color: #a0ff60;">
+    <h3>🟢 Elecciones que reconfiguran Europa</h3>
+    <p>
+      <b>Alemania</b> navega un escenario de coalición compleja con AfD en alza.
+      <b>Francia</b> mantiene el bloqueo parlamentario tras las legislativas.
+      En <b>España</b>, las próximas elecciones municipales pueden redefinir
+      el equilibrio territorial. La fragmentación electoral es la nueva norma
+      en democracias occidentales.
+    </p>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- MINI APPS GRID                               -->
+<!-- ═══════════════════════════════════════════ -->
+<p class="section-label">Apps y herramientas</p>
+
+<div class="mini-apps">
+  <a href="https://sieg-dashboard.streamlit.app/" target="_blank" class="mini-card" style="--card-accent:#00e5ff;">
+    <span class="mini-card-icon">🌐</span>
+    <p class="mini-card-title">SIEG Hub</p>
+    <p class="mini-card-desc">Irán · Petróleo · Atlas geopolítico integrado</p>
+  </a>
+  <a href="https://sieg-radar-electoral.streamlit.app/" target="_blank" class="mini-card" style="--card-accent:#ff4d6d;">
+    <span class="mini-card-icon">🗳️</span>
+    <p class="mini-card-title">Radar Electoral España</p>
+    <p class="mini-card-desc">Tendencias · Proyecciones · Municipales</p>
+  </a>
+  <a href="https://fake-news-narrative.streamlit.app/" target="_blank" class="mini-card" style="--card-accent:#a0ff60;">
+    <span class="mini-card-icon">📡</span>
+    <p class="mini-card-title">Fake News & Narrativa</p>
+    <p class="mini-card-desc">Sesgo mediático · NLP · Análisis editorial</p>
+  </a>
+  <a href="/portfolio/tools/" class="mini-card" style="--card-accent:#c77dff;">
+    <span class="mini-card-icon">🪪</span>
+    <p class="mini-card-title">Marca de agua DNI</p>
+    <p class="mini-card-desc">Protege tus documentos · 100% local</p>
+  </a>
+  <a href="https://www.youtube.com/@coneldronenlamochila_es" target="_blank" class="mini-card" style="--card-accent:#ff6b35;">
+    <span class="mini-card-icon">🚁</span>
+    <p class="mini-card-title">Con el Dron en la Mochila</p>
+    <p class="mini-card-desc">YouTube · 500+ vídeos · Paisajes históricos</p>
+  </a>
+  <a href="/portfolio/lab/" class="mini-card" style="--card-accent:#ffd60a;">
+    <span class="mini-card-icon">🧠</span>
+    <p class="mini-card-title">Linux Lab</p>
+    <p class="mini-card-desc">Odroid · DietPi · Bash · Automatización</p>
+  </a>
+</div>
+
+{{- end }}
