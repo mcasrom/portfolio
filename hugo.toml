@@ -51,3 +51,7 @@ paginate = 10
     name = "Tools"
     url = "/tools/"
     weight = 6
+  [[menu.main]]
+    name = "Apps"
+    url = "/apps/"
+    weight = 0
