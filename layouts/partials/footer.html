@@ -1,0 +1,16 @@
+{{- if not (.Param "hideFooter") }}
+<footer class="footer">
+    <span>
+        © {{ now.Year }}
+        <a href="mailto:mybloggingnotes@gmail.com">Miguel Castillo</a>
+        · Con el Odroid en la Mochila
+    </span>
+    <span>
+        <a href="/about/">About</a>
+        &nbsp;·&nbsp;
+        <a href="/contacto/">Contacto</a>
+        &nbsp;·&nbsp;
+        <a href="https://github.com/mcasrom" target="_blank" rel="noopener">GitHub</a>
+    </span>
+</footer>
+{{- end }}

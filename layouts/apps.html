@@ -1,0 +1,486 @@
+{{- define "main" }}
+<!--- layouts/apps.html - Con el Odroid en la Mochila --->
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;800&display=swap');
+
+  :root {
+    --bg:        #0a0c10;
+    --surface:   #111318;
+    --border:    #1e2230;
+    --accent:    #00e5ff;
+    --accent2:   #ff4d6d;
+    --accent3:   #a0ff60;
+    --text:      #e0e6f0;
+    --muted:     #5a6080;
+    --mono:      'Space Mono', monospace;
+    --sans:      'Syne', sans-serif;
+  }
+
+  .apps-hero {
+    padding: 4rem 0 2rem;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 3rem;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .apps-hero::before {
+    content: '';
+    position: absolute;
+    top: -60px; left: -60px;
+    width: 320px; height: 320px;
+    background: radial-gradient(circle, rgba(0,229,255,0.07) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .apps-hero::after {
+    content: '';
+    position: absolute;
+    bottom: -40px; right: 10%;
+    width: 200px; height: 200px;
+    background: radial-gradient(circle, rgba(255,77,109,0.06) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .hero-label {
+    font-family: var(--mono);
+    font-size: 0.7rem;
+    letter-spacing: 0.2em;
+    color: var(--accent);
+    text-transform: uppercase;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .hero-label::before {
+    content: '▶';
+    font-size: 0.6rem;
+    animation: blink 1.4s step-end infinite;
+  }
+
+  @keyframes blink { 50% { opacity: 0; } }
+
+  .apps-hero h1 {
+    font-family: var(--sans);
+    font-size: clamp(2rem, 5vw, 3.5rem);
+    font-weight: 800;
+    line-height: 1.05;
+    color: var(--text);
+    margin: 0 0 1rem;
+  }
+
+  .apps-hero h1 span {
+    color: var(--accent);
+  }
+
+  .hero-desc {
+    font-family: var(--mono);
+    font-size: 0.85rem;
+    color: var(--muted);
+    max-width: 560px;
+    line-height: 1.7;
+    margin-bottom: 1.5rem;
+  }
+
+  .hero-stack {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .stack-tag {
+    font-family: var(--mono);
+    font-size: 0.65rem;
+    padding: 0.25rem 0.6rem;
+    border: 1px solid var(--border);
+    color: var(--muted);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  /* GRID */
+  .apps-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 4rem;
+  }
+
+  .app-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: 1.5rem;
+    position: relative;
+    transition: border-color 0.2s, transform 0.2s;
+    overflow: hidden;
+    text-decoration: none;
+    display: block;
+    color: inherit;
+  }
+
+  .app-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: var(--card-accent, var(--accent));
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.3s ease;
+  }
+
+  .app-card:hover {
+    border-color: var(--card-accent, var(--accent));
+    transform: translateY(-3px);
+    text-decoration: none;
+    color: inherit;
+  }
+
+  .app-card:hover::before {
+    transform: scaleX(1);
+  }
+
+  .card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 1rem;
+  }
+
+  .card-icon {
+    font-size: 1.8rem;
+    line-height: 1;
+  }
+
+  .card-status {
+    font-family: var(--mono);
+    font-size: 0.6rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    padding: 0.2rem 0.5rem;
+    border: 1px solid;
+    color: var(--card-accent, var(--accent));
+    border-color: var(--card-accent, var(--accent));
+  }
+
+  .card-title {
+    font-family: var(--sans);
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--text);
+    margin: 0 0 0.5rem;
+    line-height: 1.3;
+  }
+
+  .card-desc {
+    font-family: var(--mono);
+    font-size: 0.75rem;
+    color: var(--muted);
+    line-height: 1.6;
+    margin: 0 0 1.2rem;
+  }
+
+  .card-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    margin-bottom: 1.2rem;
+  }
+
+  .card-tag {
+    font-family: var(--mono);
+    font-size: 0.6rem;
+    padding: 0.15rem 0.4rem;
+    background: rgba(255,255,255,0.04);
+    color: var(--muted);
+    letter-spacing: 0.08em;
+  }
+
+  .card-cta {
+    font-family: var(--mono);
+    font-size: 0.7rem;
+    color: var(--card-accent, var(--accent));
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+
+  .card-cta::after {
+    content: '→';
+    transition: transform 0.2s;
+  }
+
+  .app-card:hover .card-cta::after {
+    transform: translateX(4px);
+  }
+
+  /* CARD FEATURED (hub) */
+  .app-card.featured {
+    grid-column: 1 / -1;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+    align-items: center;
+    padding: 2rem;
+  }
+
+  @media (max-width: 600px) {
+    .app-card.featured { grid-template-columns: 1fr; }
+  }
+
+  .featured-left .card-title {
+    font-size: 1.5rem;
+  }
+
+  /* TOOL CARD */
+  .tool-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: 1.5rem;
+    display: flex;
+    gap: 1.2rem;
+    align-items: flex-start;
+    transition: border-color 0.2s;
+    text-decoration: none;
+    color: inherit;
+  }
+
+  .tool-card:hover {
+    border-color: var(--accent3);
+    text-decoration: none;
+    color: inherit;
+  }
+
+  .tool-icon {
+    font-size: 1.5rem;
+    flex-shrink: 0;
+    margin-top: 0.1rem;
+  }
+
+  .tool-title {
+    font-family: var(--sans);
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--text);
+    margin: 0 0 0.3rem;
+  }
+
+  .tool-desc {
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    color: var(--muted);
+    line-height: 1.5;
+    margin: 0;
+  }
+
+  /* SECTION TITLES */
+  .section-title {
+    font-family: var(--mono);
+    font-size: 0.7rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin: 0 0 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+  }
+
+  .section-title::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  /* ODROID FOOTER */
+  .odroid-banner {
+    border: 1px solid var(--border);
+    padding: 2rem;
+    display: flex;
+    gap: 2rem;
+    align-items: center;
+    background: linear-gradient(135deg, var(--surface) 0%, rgba(0,229,255,0.03) 100%);
+    margin-top: 2rem;
+  }
+
+  .odroid-icon { font-size: 2.5rem; flex-shrink: 0; }
+
+  .odroid-text h3 {
+    font-family: var(--sans);
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text);
+    margin: 0 0 0.4rem;
+  }
+
+  .odroid-text p {
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    color: var(--muted);
+    margin: 0;
+    line-height: 1.6;
+  }
+
+  .odroid-text p a {
+    color: var(--accent);
+    text-decoration: none;
+  }
+</style>
+
+<div class="apps-hero">
+  <div class="hero-label">Con el Odroid en la Mochila</div>
+  <h1>Inteligencia abierta.<br><span>Datos sin filtros.</span></h1>
+  <p class="hero-desc">
+    Dashboards geopolíticos, análisis electoral y detección de narrativa mediática —
+    construidos en Python y desplegados desde una tarjeta ARM del tamaño de una mano.
+  </p>
+  <div class="hero-stack">
+    <span class="stack-tag">Python</span>
+    <span class="stack-tag">Streamlit</span>
+    <span class="stack-tag">Odroid</span>
+    <span class="stack-tag">DietPi</span>
+    <span class="stack-tag">Linux</span>
+    <span class="stack-tag">Open Source</span>
+  </div>
+</div>
+
+<!-- DASHBOARDS -->
+<p class="section-title">Dashboards geopolíticos</p>
+
+<div class="apps-grid">
+
+  <!-- HUB FEATURED -->
+  <a href="https://sieg-dashboard.streamlit.app/" target="_blank" rel="noopener"
+     class="app-card featured" style="--card-accent: #00e5ff;">
+    <div class="featured-left">
+      <div class="card-header">
+        <span class="card-icon">🌐</span>
+        <span class="card-status">Live</span>
+      </div>
+      <h2 class="card-title">SIEG — Sistema de Inteligencia Estratégica Geopolítica</h2>
+      <p class="card-desc">
+        Hub central que integra el Atlas de tensiones globales, seguimiento de la crisis iraní
+        y geopolítica del petróleo en un único panel de control. Actualización continua
+        con fuentes abiertas.
+      </p>
+      <div class="card-tags">
+        <span class="card-tag">Irán</span>
+        <span class="card-tag">Petróleo</span>
+        <span class="card-tag">Atlas global</span>
+        <span class="card-tag">Tensiones</span>
+        <span class="card-tag">OSINT</span>
+      </div>
+      <span class="card-cta">Abrir dashboard</span>
+    </div>
+    <div class="featured-right" style="opacity:0.15; font-family: monospace; font-size:0.6rem; color: #00e5ff; line-height:1.8; user-select:none; overflow:hidden; max-height:180px;">
+      TENSION_INDEX: 87.4<br>
+      OIL_RISK: HIGH<br>
+      IR_STATUS: CRITICAL<br>
+      CABLES: 12 MONITORED<br>
+      CONFLICTS: 23 ACTIVE<br>
+      ELECTIONS: 8 PENDING<br>
+      LAST_UPDATE: NOW<br>
+      SOURCE: OSINT/PUBLIC<br>
+      MODEL: PYTHON+ST<br>
+      INFRA: ODROID-XU4<br>
+    </div>
+  </a>
+
+  <!-- ELECTORAL -->
+  <a href="https://sieg-radar-electoral.streamlit.app/" target="_blank" rel="noopener"
+     class="app-card" style="--card-accent: #ff4d6d;">
+    <div class="card-header">
+      <span class="card-icon">🗳️</span>
+      <span class="card-status">Live</span>
+    </div>
+    <h2 class="card-title">Radar Electoral España</h2>
+    <p class="card-desc">
+      Análisis de tendencias electorales nacionales y proyección de escenarios
+      para próximas elecciones municipales. Evolución de partidos, volatilidad
+      del voto y modelos predictivos.
+    </p>
+    <div class="card-tags">
+      <span class="card-tag">Elecciones</span>
+      <span class="card-tag">España</span>
+      <span class="card-tag">Municipales</span>
+      <span class="card-tag">Partidos</span>
+    </div>
+    <span class="card-cta">Abrir radar</span>
+  </a>
+
+  <!-- FAKE NEWS -->
+  <a href="https://fake-news-narrative.streamlit.app/" target="_blank" rel="noopener"
+     class="app-card" style="--card-accent: #a0ff60;">
+    <div class="card-header">
+      <span class="card-icon">📡</span>
+      <span class="card-status">Live</span>
+    </div>
+    <h2 class="card-title">Fake News & Narrativa Editorial</h2>
+    <p class="card-desc">
+      Valoración de la narrativa en medios: detección de sesgos, análisis de
+      encuadre informativo y seguimiento de desinformación en tiempo real.
+      Metodología OSINT + NLP.
+    </p>
+    <div class="card-tags">
+      <span class="card-tag">Fake news</span>
+      <span class="card-tag">Media</span>
+      <span class="card-tag">NLP</span>
+      <span class="card-tag">Narrativa</span>
+      <span class="card-tag">Sesgo</span>
+    </div>
+    <span class="card-cta">Abrir análisis</span>
+  </a>
+
+</div>
+
+<!-- TOOLS -->
+<p class="section-title">Herramientas</p>
+
+<div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px,1fr)); gap: 1rem; margin-bottom: 3rem;">
+
+  <a href="/tools/dni-watermark/" class="tool-card">
+    <span class="tool-icon">🪪</span>
+    <div>
+      <p class="tool-title">Marca de agua para documentos</p>
+      <p class="tool-desc">
+        Añade marca de agua personalizada a DNI, pasaporte u otros documentos
+        para dificultar su copia no autorizada. Funciona 100% en local, sin subir datos.
+      </p>
+    </div>
+  </a>
+
+  <a href="https://www.youtube.com/@coneldronenlamochila_es" target="_blank" rel="noopener" class="tool-card">
+    <span class="tool-icon">🚁</span>
+    <div>
+      <p class="tool-title">Con el Dron en la Mochila</p>
+      <p class="tool-desc">
+        Canal YouTube — paisajes e itinerarios históricos filmados con minidrones.
+        +500 vídeos y Shorts. Perspectivas que solo se ven desde arriba.
+      </p>
+    </div>
+  </a>
+
+</div>
+
+<!-- ODROID BANNER -->
+<div class="odroid-banner">
+  <div class="odroid-icon">🧠</div>
+  <div class="odroid-text">
+    <h3>Infraestructura: Con el Odroid en la Mochila</h3>
+    <p>
+      Todo este stack corre en tarjetas ARM Odroid + DietPi, sincronizado con GitHub via cron.
+      Sin cloud corporativo, sin costes de servidor, sin dependencias opacas.
+      Código abierto, reproducible, auditable. Así se hace inteligencia independiente.
+      <br><br>
+      <a href="/lab/">→ Ver el laboratorio Linux</a> &nbsp;|&nbsp;
+      <a href="https://github.com/mcasrom" target="_blank" rel="noopener">→ GitHub mcasrom</a>
+    </p>
+  </div>
+</div>
+
+{{- end }}

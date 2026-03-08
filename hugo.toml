@@ -2,7 +2,8 @@ baseURL = "https://mcasrom.github.io/portfolio/"
 languageCode = "es-ES"
 title = "mcasrom | Geopolítica · Linux · Drones"
 theme = "PaperMod"
-paginate = 10
+[pagination]
+  pagerSize = 10
 
 [params]
   author = "mcasrom"
@@ -55,3 +56,11 @@ paginate = 10
     name = "Apps"
     url = "/apps/"
     weight = 0
+  [[menu.main]]
+    name = "About"
+    url = "/about/"
+    weight = 8
+  [[menu.main]]
+    name = "Contacto"
+    url = "/contacto/"
+    weight = 9
